@@ -1,0 +1,29 @@
+name: Demo 2 - Protection rules
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Build
+        run: echo "Building ${GITHUB_SHA::7} from branch $GITHUB_REF_NAME"
+
+  deploy-staging:
+    needs: build
+    runs-on: ubuntu-latest
+    environment: staging
+    steps:
+      - name: Deploy to staging
+        run: echo "Deployed ${GITHUB_SHA::7} to staging"
+
+  deploy-production:
+    needs: deploy-staging
+    runs-on: ubuntu-latest
+    environment:
+      name: production
+      url: ${{ github.server_url }}/${{ github.repository }}/tree/${{ github.sha }}
+    steps:
+      - name: Deploy to production
+        run: echo "Deployed ${GITHUB_SHA::7} to production"

@@ -1,0 +1,20 @@
+name: Demo 5 - GITHUB_TOKEN permissions
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  open-issue:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Open an issue with the GITHUB_TOKEN
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_REPO: ${{ github.repository }}
+        run: |
+          gh issue create \
+            --title "Opened by Demo 5, run #$GITHUB_RUN_NUMBER" \
+            --body "Created by a workflow using the GITHUB_TOKEN."

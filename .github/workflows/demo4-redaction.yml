@@ -1,0 +1,23 @@
+name: Demo 4 - Redaction
+
+on:
+  workflow_dispatch:
+
+jobs:
+  redaction:
+    runs-on: ubuntu-latest
+    env:
+      API_KEY: ${{ secrets.API_KEY }}
+    steps:
+      - name: Print the secret
+        run: echo "The key is $API_KEY"
+
+      - name: Print a transformed copy
+        run: echo "$API_KEY" | sed 's/./& /g'
+
+      - name: Mask a value created during the run
+        run: |
+          SESSION_TOKEN="tok-$RANDOM$RANDOM"
+          echo "Before masking: $SESSION_TOKEN"
+          echo "::add-mask::$SESSION_TOKEN"
+          echo "After masking:  $SESSION_TOKEN"

@@ -1,0 +1,25 @@
+name: Demo 1 - Environments
+
+on:
+  workflow_dispatch:
+
+jobs:
+  deploy-staging:
+    runs-on: ubuntu-latest
+    environment:
+      name: staging
+      url: ${{ steps.deploy.outputs.site_url }}
+    steps:
+      - name: Pretend to deploy
+        id: deploy
+        run: |
+          echo "Deploying commit ${GITHUB_SHA::7} to staging..."
+          URL="$GITHUB_SERVER_URL/$GITHUB_REPOSITORY/tree/$GITHUB_SHA"
+          echo "site_url=$URL" >> "$GITHUB_OUTPUT"
+
+  sandbox:
+    runs-on: ubuntu-latest
+    environment: sandbox-${{ github.actor }}
+    steps:
+      - name: Use an environment nobody created
+        run: echo "GitHub created this environment when the job named it."

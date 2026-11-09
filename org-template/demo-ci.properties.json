@@ -1,0 +1,5 @@
+{
+  "name": "Demo org CI",
+  "description": "Starter CI with least-privilege permissions and a job timeout.",
+  "iconName": "octicon smiley"
+}

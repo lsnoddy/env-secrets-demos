@@ -1,0 +1,19 @@
+name: Demo org CI
+
+on:
+  push:
+    branches: [ $default-branch ]
+  pull_request:
+    branches: [ $default-branch ]
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v7
+      - name: Run the team's standard checks
+        run: echo "Hello from the $GITHUB_REPOSITORY_OWNER CI template"

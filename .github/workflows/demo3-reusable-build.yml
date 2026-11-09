@@ -1,0 +1,56 @@
+name: Demo 3 - Reusable build (called)
+
+on:
+  workflow_call:
+    inputs:
+      target:
+        description: Where this build is headed
+        required: true
+        type: string
+      verbose:
+        description: Print extra detail
+        required: false
+        type: boolean
+        default: false
+    secrets:
+      api_key:
+        required: false
+    outputs:
+      build-label:
+        description: Label produced by the build
+        value: ${{ jobs.build.outputs.label }}
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    outputs:
+      label: ${{ steps.label.outputs.label }}
+    steps:
+      - name: Build
+        env:
+          TARGET: ${{ inputs.target }}
+        run: echo "Building for $TARGET from $GITHUB_REPOSITORY"
+
+      - name: Extra detail
+        if: ${{ inputs.verbose }}
+        env:
+          CALLER: ${{ github.workflow }}
+        run: |
+          echo "github.workflow here is the caller: $CALLER"
+          echo "Triggered by: $GITHUB_EVENT_NAME"
+
+      - name: Did the caller pass the secret?
+        env:
+          API_KEY: ${{ secrets.api_key }}
+        run: |
+          if [ -n "$API_KEY" ]; then
+            echo "api_key received (the value stays masked)"
+          else
+            echo "no api_key passed"
+          fi
+
+      - name: Make a label
+        id: label
+        env:
+          TARGET: ${{ inputs.target }}
+        run: echo "label=$TARGET-${GITHUB_SHA::7}" >> "$GITHUB_OUTPUT"

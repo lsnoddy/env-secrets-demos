@@ -1,0 +1,23 @@
+name: Demo 1 - Allowed actions policy
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  policy-check:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out the repo (GitHub-created action)
+        uses: actions/checkout@v7
+
+      - name: Add slug variables (community action)
+        uses: rlespinasse/github-slug-action@v5
+
+      - name: Show what the community action produced
+        run: |
+          echo "Branch slug: $GITHUB_REF_SLUG"
+          echo "Short SHA:   $GITHUB_SHA_SHORT"
+          echo "Repo slug:   $GITHUB_REPOSITORY_SLUG"

@@ -1,0 +1,34 @@
+name: Demo 2 - Artifact retention
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  actions: read
+
+jobs:
+  build-report:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Create a build report
+        run: |
+          mkdir -p out
+          echo "Built ${GITHUB_SHA::7} in run #$GITHUB_RUN_NUMBER" > out/report.txt
+          cat out/report.txt
+
+      - name: Upload it with a 1-day retention
+        id: upload
+        uses: actions/upload-artifact@v7
+        with:
+          name: build-report
+          path: out/report.txt
+          retention-days: 1
+
+      - name: Ask GitHub when it will delete the artifact
+        env:
+          GH_TOKEN: ${{ github.token }}
+          ARTIFACT_ID: ${{ steps.upload.outputs.artifact-id }}
+        run: |
+          gh api "repos/$GITHUB_REPOSITORY/actions/artifacts/$ARTIFACT_ID" \
+            --jq '"Artifact \(.name) expires at \(.expires_at)"'

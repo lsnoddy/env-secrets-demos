@@ -1,0 +1,26 @@
+name: Demo 4 - Composite action
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out the repo
+        uses: actions/checkout@v7
+
+      - name: Run the composite action
+        id: summary
+        uses: ./.github/actions/build-summary
+        with:
+          app-name: demo-app
+
+      - name: Use its output
+        env:
+          LINE: ${{ steps.summary.outputs.summary-line }}
+        run: |
+          echo "The action said: $LINE"

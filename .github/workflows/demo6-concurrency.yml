@@ -1,0 +1,29 @@
+name: Demo 6 - Concurrency and timeouts
+
+on:
+  workflow_dispatch:
+    inputs:
+      work-seconds:
+        description: How long the pretend deploy takes (seconds)
+        type: number
+        default: 40
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    timeout-minutes: 1
+    steps:
+      - name: Pretend to deploy
+        env:
+          WORK_SECONDS: ${{ inputs.work-seconds }}
+        run: |
+          echo "Run #$GITHUB_RUN_NUMBER working for $WORK_SECONDS seconds..."
+          sleep "$WORK_SECONDS"
+          echo "Done"

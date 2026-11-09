@@ -1,0 +1,33 @@
+name: Demo 3 - Caller
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  staging:
+    uses: ./.github/workflows/demo3-reusable-build.yml
+    with:
+      target: staging
+    secrets:
+      api_key: ${{ secrets.API_KEY }}
+
+  production:
+    uses: ./.github/workflows/demo3-reusable-build.yml
+    with:
+      target: production
+      verbose: true
+
+  report:
+    runs-on: ubuntu-latest
+    needs: [staging, production]
+    steps:
+      - name: Use the outputs from both calls
+        env:
+          STAGING_LABEL: ${{ needs.staging.outputs.build-label }}
+          PRODUCTION_LABEL: ${{ needs.production.outputs.build-label }}
+        run: |
+          echo "Staging build:    $STAGING_LABEL"
+          echo "Production build: $PRODUCTION_LABEL"

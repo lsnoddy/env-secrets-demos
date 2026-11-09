@@ -1,0 +1,49 @@
+name: Demo 5 - Dependency caching
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - cache-demo/deps.txt
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out the repo
+        uses: actions/checkout@v7
+
+      - name: Restore dependency cache
+        id: deps-cache
+        uses: actions/cache@v6
+        with:
+          path: ~/.demo-deps
+          key: demo-deps-${{ runner.os }}-${{ hashFiles('cache-demo/deps.txt') }}
+          restore-keys: |
+            demo-deps-${{ runner.os }}-
+
+      - name: Install dependencies (slow on a miss)
+        if: steps.deps-cache.outputs.cache-hit != 'true'
+        run: |
+          mkdir -p ~/.demo-deps
+          echo "Files already in the cache folder: $(ls ~/.demo-deps | wc -l)"
+          while read -r name version || [ -n "$name" ]; do
+            [ -z "$name" ] && continue
+            if [ -f ~/.demo-deps/"$name-$version" ]; then
+              echo "Reusing $name $version"
+            else
+              echo "Downloading $name $version..."
+              sleep 10
+              head -c 5000000 /dev/urandom > ~/.demo-deps/"$name-$version"
+            fi
+          done < cache-demo/deps.txt
+
+      - name: Build
+        env:
+          CACHE_HIT: ${{ steps.deps-cache.outputs.cache-hit }}
+        run: |
+          echo "cache-hit output: '$CACHE_HIT'"
+          ls -lh ~/.demo-deps

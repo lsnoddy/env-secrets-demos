@@ -15,7 +15,7 @@ jobs:
 
       - name: Run the composite action
         id: summary
-        uses: ./.github/actions/build-summary/action.yml
+        uses: ./.github/actions/build-summary
         with:
           app-name: demo-app
 

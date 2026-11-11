@@ -3,7 +3,8 @@ name: Demo 5 - GITHUB_TOKEN permissions
 on:
   workflow_dispatch:
 
-
+permissions:
+  contents: read
 
 jobs:
   open-issue:
